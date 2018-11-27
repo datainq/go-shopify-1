@@ -11,6 +11,7 @@ const collectsBasePath = "admin/collects"
 // of the Shopify API.
 // See: https://help.shopify.com/api/reference/products/collect
 type CollectService interface {
+	Create(Collect) (*Collect, error)
 	List(interface{}) ([]Collect, error)
 	Count(interface{}) (int, error)
 }
@@ -41,6 +42,14 @@ type CollectResource struct {
 // Represents the result from the collects.json endpoint
 type CollectsResource struct {
 	Collects []Collect `json:"collects"`
+}
+
+func (s *CollectServiceOp) Create(collect Collect) (*Collect, error) {
+	path := fmt.Sprintf("%s.json", collectsBasePath)
+	wrappedData := CollectResource{Collect: &collect}
+	resource := new(CollectResource)
+	err := s.client.Post(path, wrappedData, resource)
+	return resource.Collect, err
 }
 
 // List collects

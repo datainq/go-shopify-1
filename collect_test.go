@@ -29,6 +29,24 @@ func collectTests(t *testing.T, collect Collect) {
 	}
 }
 
+func TestCollectCreate(t *testing.T) {
+	setup()
+	defer teardown()
+
+	httpmock.RegisterResponder("POST", "https://fooshop.myshopify.com/admin/collects.json",
+		httpmock.NewStringResponder(200, `{"collects": [{"id":1, "product_id": 2, "collection_id": 3}]}`))
+
+	collects, err := client.Collect.Create(Collect{ProductID: 2, CollectionID: 3})
+	if err != nil {
+		t.Errorf("Collect.Create returned error: %v", err)
+	}
+
+	expected := []Collect{{ID: 1, ProductID: 2, CollectionID: 3}}
+	if !reflect.DeepEqual(collects, expected) {
+		t.Errorf("Collect.Create returned %+v, expected %+v", collects, expected)
+	}
+}
+
 func TestCollectList(t *testing.T) {
 	setup()
 	defer teardown()
